@@ -47,22 +47,22 @@ class AuthController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
             'cedula' => 'required|string|unique:users',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
+            'telefono' => 'required|string|max:20',
+            'direccion' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6',
             'coins' => 'required|integer|min:0',
         ]);
 
         $prestamista = User::create([
-            'name' => $request->name,
-            'last_name' => $request->last_name,
+            'name' => $request->nombre,
+            'last_name' => $request->apellidos,
             'cedula' => $request->cedula,
-            'phone' => $request->phone,
-            'address' => $request->address,
+            'phone' => $request->telefono,
+            'address' => $request->direccion,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'prestamista',
@@ -70,6 +70,11 @@ class AuthController extends Controller
         ]);
 
         return response()->json(['prestamista' => $prestamista], 201);
+    }
+
+    public function listaPrestamista(){
+        $prestamistas = User::where('role', 'prestamista')->get();
+        return response()->json($prestamistas);
     }
 
 
