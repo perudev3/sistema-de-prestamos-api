@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CiudadanoController;
 use App\Http\Controllers\DenunciaController;
+use App\Http\Controllers\SettingController;
 
 Route::post('login', [AuthController::class, 'login']);
 
@@ -23,4 +24,9 @@ Route::middleware('auth:api')->group(function () {
 
 
      Route::post('denuncias', [DenunciaController::class, 'store']);
+
+     Route::get('settings', [SettingController::class, 'index']);
+     Route::get('settings/{key}', [SettingController::class, 'show']);
+     Route::post('settings', [SettingController::class, 'store']);
+     Route::post('settings/upload', [SettingController::class, 'upload']);
 });
