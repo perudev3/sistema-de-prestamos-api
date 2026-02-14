@@ -19,7 +19,8 @@ class Denuncia extends Model
         'descripcion_deuda',
         'imagenes',
         'nombre_reportante',
-        'celular'
+        'celular',
+        'estado'
     ];
 
     protected $casts = [

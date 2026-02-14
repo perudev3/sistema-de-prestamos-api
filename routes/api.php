@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CiudadanoController;
 use App\Http\Controllers\DenunciaController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\CoinsController;
 
 Route::post('login', [AuthController::class, 'login']);
 
@@ -24,6 +25,10 @@ Route::middleware('auth:api')->group(function () {
 
 
      Route::post('denuncias', [DenunciaController::class, 'store']);
+     Route::get('/mis-denuncias', [DenunciaController::class, 'misDenuncias']);
+
+     Route::post('/comprar-coins', [CoinsController::class, 'comprar']);
+
 
      Route::get('settings', [SettingController::class, 'index']);
      Route::get('settings/{key}', [SettingController::class, 'show']);
