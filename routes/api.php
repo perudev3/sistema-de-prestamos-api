@@ -25,10 +25,15 @@ Route::middleware('auth:api')->group(function () {
 
 
      Route::post('denuncias', [DenunciaController::class, 'store']);
+     Route::get('/lista-denuncias', [DenunciaController::class, 'listaDenuncias']);
+     Route::post('/aprobar-denuncias', [DenunciaController::class, 'aprobarDenuncias']);
+     Route::post('/rechazar-denuncias', [DenunciaController::class, 'rechazarDenuncias']);
      Route::get('/mis-denuncias', [DenunciaController::class, 'misDenuncias']);
 
      Route::post('/comprar-coins', [CoinsController::class, 'comprar']);
-
+     Route::get('/solicitudes-coins', [CoinsController::class, 'solicitudesCoins']);
+     Route::post('/aprobar-coins', [CoinsController::class, 'aprobarCoins']);
+     Route::post('/rechazar-coins', [CoinsController::class, 'rechazarCoins']);
 
      Route::get('settings', [SettingController::class, 'index']);
      Route::get('settings/{key}', [SettingController::class, 'show']);

@@ -18,4 +18,10 @@ class CoinCompra extends Model
         'comprobante',
         'estado'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Denuncia;
 use App\Models\Ciudadano;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+
 
 class DenunciaController extends Controller
 {
@@ -110,6 +112,51 @@ class DenunciaController extends Controller
         return response()->json([
             'ok' => true,
             'data' => $denuncias
+        ]);
+    }
+
+     /* =========================================
+       LISTA GENERAL (ADMIN)
+    ========================================= */
+    public function listaDenuncias()
+    {
+        $denuncias = Denuncia::orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'ok' => true,
+            'data' => $denuncias
+        ]);
+    }
+
+    /* =========================================
+       APROBAR (ADMIN)
+    ========================================= */
+    public function aprobarDenuncias(Request $request)
+    {
+        $denuncia = Denuncia::findOrFail($request->denuncia_id);
+
+        $denuncia->estado = 'validado';
+        $denuncia->save();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Denuncia aprobada'
+        ]);
+    }
+
+    /* =========================================
+       RECHAZAR (ADMIN)
+    ========================================= */
+    public function rechazarDenuncias(Request $request)
+    {
+        $denuncia = Denuncia::findOrFail($request->id);
+
+        $denuncia->estado = 'rechazado';
+        $denuncia->save();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Denuncia rechazada'
         ]);
     }
 

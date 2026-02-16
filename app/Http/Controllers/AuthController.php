@@ -4,8 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Ciudadano;
+use App\Models\Denuncia;
+use App\Models\CoinCompra;
+use App\Models\Consulta;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -81,8 +86,49 @@ class AuthController extends Controller
     // Obtener usuario autenticado
     public function user(Request $request)
     {
-        return response()->json($request->user());
-    }
+        $user = $request->user();
 
-    
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+
+        /* ===== MÉTRICAS ===== */
+
+        $prestamistas = User::where('role', 'prestamista')->count();
+        $ciudadanos = Ciudadano::count();
+        $totalReportes = Denuncia::count();
+        $pendientes = Denuncia::where('estado', 'pendiente')->count();
+
+        $ingresosMes = CoinCompra::where('estado', 'aprobado')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->sum('total'); 
+
+        $consultasMes = Consulta::whereMonth('created_at', Carbon::now()->month)
+            ->count();
+
+        $reportesPendientes = Denuncia::with('ciudadano')
+            ->where('estado', 'pendiente')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $pagosRecientes = CoinCompra::with('user')
+            ->where('estado', 'aprobado')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // 👇 Combinar datos del usuario con datos del dashboard
+        return response()->json(array_merge($user->toArray(), [
+            'prestamistas' => $prestamistas,
+            'ciudadanos' => $ciudadanos,
+            'total_reportes' => $totalReportes,
+            'pendientes' => $pendientes,
+            'ingresos_mes' => $ingresosMes,
+            'consultas_mes' => $consultasMes,
+            'reportes_pendientes' => $reportesPendientes,
+            'pagos_recientes' => $pagosRecientes,
+        ]));
+    }
+        
 }
