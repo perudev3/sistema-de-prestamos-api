@@ -9,20 +9,44 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CoinsController;
 
 Route::post('login', [AuthController::class, 'login']);
+Route::get('/settings-publicos', [SettingController::class, 'settingsPublicos']);
+Route::get('/manifest.json', [SettingController::class,'manifest']);
+
 
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('user', [AuthController::class, 'user']);
 
     // Solo admin puede crear prestamistas
-     Route::post('prestamistas', [AuthController::class, 'createPrestamista']);
-     Route::get('prestamistas/lista', [AuthController::class, 'listaPrestamista']);
+    Route::post('prestamistas', [AuthController::class, 'createPrestamista']);
+    Route::get('prestamistas/lista', [AuthController::class, 'listaPrestamista']);
+    Route::get('prestamistas/{id}', [AuthController::class, 'showPrestamista']);
+    Route::put('prestamistas/{id}', [AuthController::class, 'updatePrestamista']);
+    Route::delete('prestamistas/{id}', [AuthController::class, 'deletePrestamista']);
+    Route::post('prestamistas/{id}/password', [AuthController::class, 'changePasswordPrestamista']);
 
     //Registro de Ciudadano
-     Route::post('ciudadanos', [CiudadanoController::class, 'store']);
-     Route::get('ciudadanos/lista', [CiudadanoController::class, 'listaCiudadanos']);
-     Route::post('ciudadanos/consultar', [CiudadanoController::class, 'consultar']);
+    Route::post('ciudadanos', [CiudadanoController::class, 'store']);
 
+    Route::get(
+    'ciudadanos/lista',
+    [CiudadanoController::class, 'listaCiudadanos']
+    );
+
+    Route::post(
+    'ciudadanos/consultar',
+    [CiudadanoController::class, 'consultar']
+    );
+
+    Route::get(
+    'ciudadanos/{id}/historial',
+    [CiudadanoController::class, 'historial']
+    );
+
+    Route::put(
+    'ciudadanos/{id}',
+    [CiudadanoController::class, 'update']
+    );
 
      Route::post('denuncias', [DenunciaController::class, 'store']);
      Route::get('/lista-denuncias', [DenunciaController::class, 'listaDenuncias']);

@@ -79,4 +79,75 @@ class SettingController extends Controller
             'path'=>$path
         ]);
     }
+
+    public function manifest()
+    {
+        $setting = Setting::where('key','system_config')->first();
+
+        $config = json_decode($setting->value, true);
+
+        $logo = $config['app_logo'] ?? null;
+
+        $version = time();
+
+        $logoUrl = $logo
+            ? asset('storage/'.$logo).'?v='.$version
+            : asset('default/logo.png');
+
+        return response()->json([
+            "name" => "DataCrédito Empresarios",
+            "short_name" => "DataCrédito",
+            "start_url" => "/",
+            "display" => "standalone",
+            "background_color" => "#020617",
+            "theme_color" => "#020617",
+
+            "icons" => [
+                [
+                    "src" => $logoUrl,
+                    "sizes" => "192x192",
+                    "type" => "image/png"
+                ],
+                [
+                    "src" => $logoUrl,
+                    "sizes" => "512x512",
+                    "type" => "image/png"
+                ]
+            ]
+        ]);
+    }
+
+
+    public function settingsPublicos()
+    {
+        $setting = Setting::where('key', 'system_config')->first();
+
+        if (!$setting) {
+            return response()->json([
+                'whatsapp' => null
+            ]);
+        }
+
+        $config = json_decode($setting->value, true);
+
+        $whatsapp = null;
+
+        if (isset($config['whatsapp_contact'])) {
+            $code = $config['whatsapp_contact']['country_code'] ?? '';
+            $number = $config['whatsapp_contact']['number'] ?? '';
+
+            if ($number) {
+                // Quitar +
+                $code = str_replace('+', '', $code);
+
+                $whatsapp = $code . $number;
+            }
+        }
+
+        return response()->json([
+            'whatsapp' => $whatsapp
+        ]);
+    }
+
+
 }

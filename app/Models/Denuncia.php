@@ -38,4 +38,9 @@ class Denuncia extends Model
         return $this->belongsTo(Ciudadano::class, 'ciudadano_id');
     }
 
+    public function user()
+{
+    return $this->belongsTo(User::class, 'prestamista_id');
+}
+
 }

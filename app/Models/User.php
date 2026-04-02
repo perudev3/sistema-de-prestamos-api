@@ -35,4 +35,14 @@ class User extends Authenticatable
     {
         return $this->role === 'prestamista';
     }
+
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'user_id');
+    }
+
+    public function consultas()
+    {
+        return $this->hasMany(Consulta::class, 'user_id');
+    }
 }

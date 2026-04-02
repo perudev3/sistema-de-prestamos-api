@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Consulta extends Model
 {
@@ -25,4 +26,13 @@ class Consulta extends Model
     {
         return $this->belongsTo(Ciudadano::class, 'ciudadano_id');
     }
+
+    public function prestamista()
+    {
+        return $this->belongsTo(
+            User::class,
+            'prestamista_id'
+        );
+    }
+
 }

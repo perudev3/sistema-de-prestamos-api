@@ -19,4 +19,15 @@ class Ciudadano extends Model
         'direccion',
         'email'
     ];
+
+    public function consultas()
+{
+    return $this->hasMany(Consulta::class, 'ciudadano_id');
+}
+
+public function denuncias()
+{
+    return $this->hasMany(Denuncia::class, 'ciudadano_id');
+}
+
 }

@@ -31,10 +31,27 @@ class CiudadanoController extends Controller
         ], 201);
     }
 
-    public function listaCiudadanos(){
-        $ciudadanos = Ciudadano::all();
-        return response()->json($ciudadanos);
-    }
+    public function listaCiudadanos()
+{
+    $ciudadanos = Ciudadano::withCount([
+        'consultas',
+        'denuncias'
+    ])->get();
+
+    return response()->json($ciudadanos);
+}
+
+
+public function historial($id)
+{
+    $ciudadano = Ciudadano::with([
+        'consultas.prestamista',
+        'denuncias.prestamista'
+    ])->findOrFail($id);
+
+    return response()->json($ciudadano);
+}
+
 
     public function consultar(Request $request)
     {
@@ -95,4 +112,16 @@ class CiudadanoController extends Controller
             ], 500);
         }
     }
+
+    public function update(Request $request, $id)
+{
+    $ciudadano = Ciudadano::findOrFail($id);
+
+    $ciudadano->update($request->all());
+
+    return response()->json([
+        'message' => 'Ciudadano actualizado'
+    ]);
+}
+
 }

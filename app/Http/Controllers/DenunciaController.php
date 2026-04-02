@@ -119,14 +119,43 @@ class DenunciaController extends Controller
        LISTA GENERAL (ADMIN)
     ========================================= */
     public function listaDenuncias()
-    {
-        $denuncias = Denuncia::orderBy('created_at', 'desc')->get();
+{
+    $denuncias = Denuncia::with('user') // 👈 RELACIÓN PRESTAMISTA
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->map(function ($d) {
 
-        return response()->json([
-            'ok' => true,
-            'data' => $denuncias
-        ]);
-    }
+            return [
+                'id' => $d->id,
+                'cedula' => $d->cedula,
+                'nombres' => $d->nombres,
+                'apellidos' => $d->apellidos,
+                'descripcion_deuda' => $d->descripcion_deuda,
+                'estado' => $d->estado,
+
+                // 👇 PRESTAMISTA
+                'user' => [
+                    'name' => $d->user->name ?? '—',
+                    'phone' => $d->user->phone ?? '—',
+                ],
+
+                // 👇 REPORTANTE REAL
+                'nombre_reportante' => $d->nombre_reportante,
+                'celular' => $d->celular,
+
+                // 👇 EVIDENCIAS ARRAY
+                'evidencias' => json_decode($d->imagenes ?? '[]'),
+
+                'created_at' => $d->created_at->format('d/m/Y'),
+            ];
+        });
+
+    return response()->json([
+        'ok' => true,
+        'data' => $denuncias
+    ]);
+}
+
 
     /* =========================================
        APROBAR (ADMIN)
