@@ -32,25 +32,87 @@ class CiudadanoController extends Controller
     }
 
     public function listaCiudadanos()
-{
-    $ciudadanos = Ciudadano::withCount([
-        'consultas',
-        'denuncias'
-    ])->get();
+    {
+        $ciudadanos = Ciudadano::withCount([
+                'consultas',
+                'denuncias'
+            ])
+            ->with([
+                'denuncias:id,ciudadano_id,descripcion_deuda,estado',
+                'consultas:id,ciudadano_id,created_at'
+            ])
+            ->get();
 
-    return response()->json($ciudadanos);
-}
+        $ciudadanos = $ciudadanos->map(function ($c) {
+
+            // 🔥 CALCULO SIMPLE SCORE
+            $score = 1000;
+
+            // restar por denuncias
+            $score -= ($c->denuncias_count * 100);
+
+            // restar si tiene muchas consultas (ejemplo)
+            if ($c->consultas_count > 5) {
+                $score -= 50;
+            }
+
+            // evitar negativos
+            if ($score < 0) $score = 0;
+
+            return [
+                'id' => $c->id,
+                'nombre' => $c->nombre,
+                'apellidos' => $c->apellidos,
+                'cedula' => $c->cedula,
+                'telefono' => $c->telefono,
+                'direccion' => $c->direccion,
+                'email' => $c->email,
+
+                // 🔥 NUEVOS
+                'created_at' => $c->created_at
+                    ? $c->created_at->format('Y-m-d H:i')
+                    : null,
+
+                'consultas_count' => $c->consultas_count,
+                'denuncias_count' => $c->denuncias_count,
+
+                'score' => $score,
+
+                // 🔥 REPORTES NEGATIVOS
+                'denuncias' => $c->denuncias->map(function ($d) {
+                    return [
+                        'id' => $d->id,
+                        'descripcion_deuda' => $d->descripcion_deuda,
+                        'estado' => $d->estado,
+                    ];
+                }),
+
+                // 🔥 OPCIONAL (por si lo usas después)
+                'consultas_list' => $c->consultas->map(function ($con) {
+                    return [
+                        'id' => $con->id,
+                        'fecha' => $con->created_at
+                            ? $con->created_at->format('Y-m-d')
+                            : null,
+                    ];
+                }),
+
+            ];
+        });
+
+        return response()->json($ciudadanos);
+    }
 
 
-public function historial($id)
-{
-    $ciudadano = Ciudadano::with([
-        'consultas.prestamista',
-        'denuncias.prestamista'
-    ])->findOrFail($id);
+    public function historial($id)
+    {
+        $ciudadano = Ciudadano::with([
+            'consultas.prestamista',
+            'denuncias.prestamista'
+        ])->findOrFail($id);
 
-    return response()->json($ciudadano);
-}
+        return response()->json($ciudadano);
+    }
 
 
     public function consultar(Request $request)
@@ -114,14 +176,14 @@ public function historial($id)
     }
 
     public function update(Request $request, $id)
-{
-    $ciudadano = Ciudadano::findOrFail($id);
+    {
+        $ciudadano = Ciudadano::findOrFail($id);
 
-    $ciudadano->update($request->all());
+        $ciudadano->update($request->all());
 
-    return response()->json([
-        'message' => 'Ciudadano actualizado'
-    ]);
-}
+        return response()->json([
+            'message' => 'Ciudadano actualizado'
+        ]);
+    }
 
 }
